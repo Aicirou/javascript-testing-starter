@@ -1,4 +1,4 @@
-import { it, expect, describe, vi, beforeEach } from "vitest";
+import { it, expect, describe, vi, beforeEach } from 'vitest';
 import {
   getPriceInCurrency,
   getShippingInfo,
@@ -8,20 +8,20 @@ import {
   login,
   isOnline,
   getDiscount,
-} from "../src/mocking";
-import { getExchangeRate } from "../src/libs/currency";
-import { getShippingQuote } from "../src/libs/shipping";
-import { trackPageView } from "../src/libs/analytics";
-import { charge } from "../src/libs/payment";
-import { sendEmail } from "../src/libs/email";
-import security from "../src/libs/security";
+} from '../src/mocking';
+import { getExchangeRate } from '../src/libs/currency';
+import { getShippingQuote } from '../src/libs/shipping';
+import { trackPageView } from '../src/libs/analytics';
+import { charge } from '../src/libs/payment';
+import { sendEmail } from '../src/libs/email';
+import security from '../src/libs/security';
 
 //Hoisting the mock function
-vi.mock("../src/libs/currency");
-vi.mock("../src/libs/shipping");
-vi.mock("../src/libs/analytics");
-vi.mock("../src/libs/payment");
-vi.mock("../src/libs/email", async (importOriginal) => {
+vi.mock('../src/libs/currency');
+vi.mock('../src/libs/shipping');
+vi.mock('../src/libs/analytics');
+vi.mock('../src/libs/payment');
+vi.mock('../src/libs/email', async (importOriginal) => {
   const originalModule = await importOriginal();
   return {
     ...originalModule,
@@ -29,8 +29,8 @@ vi.mock("../src/libs/email", async (importOriginal) => {
   };
 });
 
-describe("test mocking", () => {
-  it("test case 1", () => {
+describe('test mocking', () => {
+  it('test case 1', () => {
     const greet = vi.fn();
     //greet.mockReturnValue("Hello world");
     //greet.mockReturnValueOnce("Hello world");
@@ -38,9 +38,9 @@ describe("test mocking", () => {
     //greet.mockRejectedValue("Hello world");
     //greet.mockImplementation(() => "Hello world");
     greet.mockImplementationOnce((name) => `Hello ${name}`);
-    expect(greet("world")).toBe("Hello world");
+    expect(greet('world')).toBe('Hello world');
   });
-  it("test case 2", () => {
+  it('test case 2', () => {
     //create a mock for the following function
     //sendText(message) {}
     //call the mock function
@@ -48,51 +48,51 @@ describe("test mocking", () => {
     //assert that the result is "ok"
 
     const sendText = vi.fn();
-    sendText.mockReturnValue("ok");
-    const result = sendText("hello");
-    expect(sendText).toHaveBeenCalledWith("hello");
-    expect(result).toBe("ok");
+    sendText.mockReturnValue('ok');
+    const result = sendText('hello');
+    expect(sendText).toHaveBeenCalledWith('hello');
+    expect(result).toBe('ok');
   });
 });
 
 //test cases for getPriceInCurrency function
-describe("getPriceInCurrency", () => {
-  it("should return price in target currency", () => {
+describe('getPriceInCurrency', () => {
+  it('should return price in target currency', () => {
     vi.mocked(getExchangeRate).mockReturnValue(1.5);
-    const price = getPriceInCurrency(10, "AUD");
+    const price = getPriceInCurrency(10, 'AUD');
     expect(price).toBe(15);
   });
 });
 
 //test cases for getShippingInfo function
-describe("getShippingInfo", () => {
-  it("should return shipping unavailable", () => {
+describe('getShippingInfo', () => {
+  it('should return shipping unavailable', () => {
     vi.mocked(getShippingQuote).mockReturnValue(null);
-    const info = getShippingInfo("US");
+    const info = getShippingInfo('US');
     expect(info).toMatch(/unavailable/i);
   });
-  it("should return shipping info", () => {
+  it('should return shipping info', () => {
     vi.mocked(getShippingQuote).mockReturnValue({
       cost: 10,
       estimatedDays: 2,
     });
-    const info = getShippingInfo("US");
+    const info = getShippingInfo('US');
     expect(info).toMatch(/shipping cost: \$10 \(2 days\)/i);
   });
 });
 
 //lesson: Interaction testing
 //test cases for renderPage function
-describe("renderPage", () => {
-  it("should return correct content", async () => {
+describe('renderPage', () => {
+  it('should return correct content', async () => {
     const result = await renderPage();
 
     expect(result).toMatch(/content/i);
   });
-  it("should call analytics", async () => {
+  it('should call analytics', async () => {
     await renderPage();
 
-    expect(trackPageView).toHaveBeenCalledWith("/home");
+    expect(trackPageView).toHaveBeenCalledWith('/home');
   });
   //   it("should track page view", async () => {
   //     const trackPageView = vi.fn();
@@ -106,52 +106,52 @@ describe("renderPage", () => {
 
 //exercise
 //test cases for submitOrder function
-describe("submitOrder", () => {
+describe('submitOrder', () => {
   const order = { totalAmount: 10 };
-  const creditCard = { creditCardNumber: "1234" };
+  const creditCard = { creditCardNumber: '1234' };
 
-  it("should charge the customer", async () => {
-    vi.mocked(charge).mockResolvedValue({ status: "success" });
+  it('should charge the customer', async () => {
+    vi.mocked(charge).mockResolvedValue({ status: 'success' });
 
     await submitOrder(order, creditCard);
 
     expect(charge).toHaveBeenCalledWith(creditCard, order.totalAmount);
   });
 
-  it("should return payment success", async () => {
-    vi.mocked(charge).mockResolvedValue({ status: "success" });
+  it('should return payment success', async () => {
+    vi.mocked(charge).mockResolvedValue({ status: 'success' });
 
     const result = await submitOrder(order, creditCard);
 
     expect(result).toEqual({ success: true });
   });
 
-  it("should return payment error", async () => {
-    vi.mocked(charge).mockResolvedValue({ status: "failed" });
+  it('should return payment error', async () => {
+    vi.mocked(charge).mockResolvedValue({ status: 'failed' });
 
     const result = await submitOrder(order, creditCard);
 
-    expect(result).toEqual({ success: false, error: "payment_error" });
+    expect(result).toEqual({ success: false, error: 'payment_error' });
   });
 });
 
 //lesson: Partial mocking
 //test cases for signUp function
-describe("signUp", () => {
+describe('signUp', () => {
   // beforeEach(() => {
   //   sendEmail.mockClear();
   //   // vi.clearAllMocks();
   // });
-  const email = "name@domain.com";
-  it("should return false for invalid email", async () => {
-    const result = await signUp("invalid@domain");
+  const email = 'name@domain.com';
+  it('should return false for invalid email', async () => {
+    const result = await signUp('invalid@domain');
     expect(result).toBe(false);
   });
-  it("should return true for valid email", async () => {
+  it('should return true for valid email', async () => {
     const result = await signUp(email);
     expect(result).toBe(true);
   });
-  it("should send welcome email if vaild email", async () => {
+  it('should send welcome email if vaild email', async () => {
     await signUp(email);
     expect(sendEmail).toHaveBeenCalledOnce();
     // console.log(sendEmail.mock.calls);
@@ -163,10 +163,10 @@ describe("signUp", () => {
 
 //lesson: Spying on functions
 //test cases for login function
-describe("login", () => {
-  const email = "name@domain.com";
-  it("should email the one-time login code", async () => {
-    const spy = vi.spyOn(security, "generateCode");
+describe('login', () => {
+  const email = 'name@domain.com';
+  it('should email the one-time login code', async () => {
+    const spy = vi.spyOn(security, 'generateCode');
 
     await login(email);
 
@@ -177,38 +177,38 @@ describe("login", () => {
 
 //lesson: Mocking dates
 //test cases for isOnline function
-describe("isOnline", () => {
-  it("should return false if current hour is outside of available hours", () => {
-    vi.setSystemTime("2024-01-01 07:59");
+describe('isOnline', () => {
+  it('should return false if current hour is outside of available hours', () => {
+    vi.setSystemTime('2024-01-01 07:59');
     expect(isOnline()).toBe(false);
 
-    vi.setSystemTime("2024-01-01 20:01");
+    vi.setSystemTime('2024-01-01 20:01');
     expect(isOnline()).toBe(false);
   });
-  it("should return true if current hour is within available hours", () => {
-    vi.setSystemTime("2024-01-01 08:00");
+  it('should return true if current hour is within available hours', () => {
+    vi.setSystemTime('2024-01-01 08:00');
     expect(isOnline()).toBe(true);
 
-    vi.setSystemTime("2024-01-01 19:59");
+    vi.setSystemTime('2024-01-01 19:59');
     expect(isOnline()).toBe(true);
   });
 });
 
 //exercise
 //test cases for getDiscount function
-describe("getDiscount", () => {
-  it("should return 0.2 for Christmas day", () => {
-    vi.setSystemTime("2024-12-25 00:01");
+describe('getDiscount', () => {
+  it('should return 0.2 for Christmas day', () => {
+    vi.setSystemTime('2024-12-25 00:01');
     expect(getDiscount()).toBe(0.2);
 
-    vi.setSystemTime("2024-12-25 23:59");
+    vi.setSystemTime('2024-12-25 23:59');
     expect(getDiscount()).toBe(0.2);
   });
-  it("should return 0 for other days", () => {
-    vi.setSystemTime("2024-12-24 23:59");
+  it('should return 0 for other days', () => {
+    vi.setSystemTime('2024-12-24 23:59');
     expect(getDiscount()).toBe(0);
 
-    vi.setSystemTime("2024-12-26 00:01");
+    vi.setSystemTime('2024-12-26 00:01');
     expect(getDiscount()).toBe(0);
   });
 });
