@@ -1,4 +1,4 @@
-import { describe, test, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { fizzBuzz, max, calculateAverage, factorial } from '../src/intro';
 
 //max function

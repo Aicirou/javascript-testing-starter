@@ -72,14 +72,19 @@ export function canDrive(age, countryCode) {
 
 // Lesson: Testing asynchronous code
 export function fetchData() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve([1, 2, 3]);
-    });
-    // setTimeout(() => {
-    //   reject({ reason: "Server error" });
-    // }, 1000);
-  });
+  return new Promise(
+    (
+      resolve,
+      //  reject
+    ) => {
+      setTimeout(() => {
+        resolve([1, 2, 3]);
+      });
+      // setTimeout(() => {
+      //   reject({ reason: 'Server error' });
+      // }, 1000);
+    },
+  );
 }
 
 // Lesson: Setup and teardown
